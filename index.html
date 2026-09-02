@@ -66,11 +66,10 @@ input,textarea,select{width:100%;padding:12px;margin:6px 0 12px;border:1px solid
 <footer id="contact">
 <strong>Naturefeelstore</strong><br><br>
 Natural & Handmade Products<br>
-WhatsApp orders • Cash on Delivery<br><br>
-<span class="note" style="color:#c8d2c9">WhatsApp number: replace 919468827188 in the code before launch.</span>
+WhatsApp orders • Cash on Delivery<br>
 </footer>
 
-<a class="wa" href="https://wa.me/919468827188" target="_blank">💬 WhatsApp Order</a>
+<a class="wa" id="floatingWaBtn" href="#" target="_blank">💬 WhatsApp Order</a>
 
 <div class="modal" id="cartModal">
 <div class="box">
@@ -94,7 +93,9 @@ WhatsApp orders • Cash on Delivery<br><br>
 </div></div>
 
 <script>
-const WHATSAPP="919468827188"; // Replace with country code + number, e.g. 919876543210
+// IMPORTANT: अपना 10 अंको का मोबाइल नंबर 91 के बाद लिखें (उदा: 919876543210)
+const WHATSAPP = "91YOUR_NUMBER_HERE"; 
+
 const DELIVERY=49, FREE_LIMIT=999;
 const products=[
 {id:1,name:"Natural Fuel (2 Kg Pack)",price:99,img:"natural-fuel.jpg",desc:"Natural fuel product."},
@@ -103,7 +104,12 @@ const products=[
 {id:4,name:"Homemade Hand Fan",price:99,img:"hand-fan.jpg",desc:"Traditional handmade hand fan."},
 {id:5,name:"Homemade Chulha",price:499,img:"chulha.jpg",desc:"Traditional handmade chulha."}
 ];
+
 let cart=[];
+
+// floating whatsapp button URL update
+document.getElementById("floatingWaBtn").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hello! I want to inquire about products on Naturefeelstore.")}`;
+
 function renderProducts(){
 const q=(document.getElementById("search").value||"").toLowerCase();
 const list=products.filter(p=>(p.name+" "+p.desc).toLowerCase().includes(q));
@@ -114,14 +120,17 @@ document.getElementById("products").innerHTML=list.map(p=>`
 <div class="buyrow"><button class="btn" onclick="add(${p.id})">🛒 Add to Cart</button>
 <button class="btn" onclick="buyNow(${p.id})">Order Now</button></div></div></div>`).join("") || "<p>No products found.</p>";
 }
+
 function add(id){cart.push(id);update();openCart();}
 function buyNow(id){cart=[id];update();openCart();}
 function update(){document.getElementById("count").textContent=cart.length}
+
 function totals(){
 const subtotal=cart.reduce((s,id)=>s+products.find(p=>p.id===id).price,0);
 const delivery=subtotal===0?0:(subtotal>=FREE_LIMIT?0:DELIVERY);
 return {subtotal,delivery,total:subtotal+delivery};
 }
+
 function openCart(){
 document.getElementById("cartModal").style.display="block";
 const groups={}; cart.forEach(id=>groups[id]=(groups[id]||0)+1);
@@ -131,19 +140,43 @@ return `<div class="cartitem"><div><b>${p.name}</b><br>₹${p.price} × ${q}</di
 }).join(""):"Your cart is empty.";
 const t=totals(); document.getElementById("subtotal").textContent=t.subtotal;document.getElementById("delivery").textContent=t.delivery;document.getElementById("total").textContent=t.total;
 }
+
 function closeCart(){document.getElementById("cartModal").style.display="none"}
 function changeQty(id,d){if(d>0)cart.push(id);else{const i=cart.indexOf(id);if(i>=0)cart.splice(i,1)}update();openCart()}
+
 function whatsappOrder(){
 if(!cart.length)return alert("Please add a product first.");
-const n=document.getElementById("name").value.trim(),ph=document.getElementById("phone").value.trim(),a=document.getElementById("address").value.trim(),pin=document.getElementById("pincode").value.trim();
+const n=document.getElementById("name").value.trim();
+const ph=document.getElementById("phone").value.trim();
+const a=document.getElementById("address").value.trim();
+const pin=document.getElementById("pincode").value.trim();
+
 if(!n||!ph||!a||!pin)return alert("Please complete name, mobile, address and PIN code.");
+
 const counts={};cart.forEach(id=>counts[id]=(counts[id]||0)+1);
-const items=Object.entries(counts).map(([id,q])=>{const p=products.find(x=>x.id==id);return `${p.name} x ${q} = ₹${p.price*q}`}).join("%0A");
+const itemsList = Object.entries(counts).map(([id,q])=>{
+    const p=products.find(x=>x.id==id);
+    return `• ${p.name} x ${q} = ₹${p.price*q}`;
+}).join("\n");
+
 const t=totals();
-const msg=`*Naturefeelstore COD Order*%0A%0A${items}%0A%0ASubtotal: ₹${t.subtotal}%0ADelivery: ₹${t.delivery}%0A*Final Payable: ₹${t.total}*%0A%0AName: ${encodeURIComponent(n)}%0AMobile: ${encodeURIComponent(ph)}%0AAddress: ${encodeURIComponent(a)}%0APIN: ${encodeURIComponent(pin)}%0APayment: Cash on Delivery`;
-if(WHATSAPP==="919468827188")return alert("Please replace 919468827188 with your WhatsApp number in the code before launch.");
-window.open(`https://wa.me/${WHATSAPP}?text=${msg}`,"_blank");
+
+const rawText = `*New Order - Naturefeelstore* 🌿\n\n` +
+`*Items Ordered:*\n${itemsList}\n\n` +
+`*Subtotal:* ₹${t.subtotal}\n` +
+`*Delivery Charge:* ₹${t.delivery}\n` +
+`*Final Amount:* ₹${t.total}\n\n` +
+`*Customer Details:*\n` +
+`👤 Name: ${n}\n` +
+`📞 Mobile: ${ph}\n` +
+`🏠 Address: ${a}\n` +
+`📍 PIN Code: ${pin}\n` +
+`💳 Payment Mode: Cash on Delivery (COD)`;
+
+const finalUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(rawText)}`;
+window.open(finalUrl, "_blank");
 }
+
 renderProducts();
 </script>
 </body>
