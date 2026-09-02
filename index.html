@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naturefeelstore | Natural & Handmade Products</title>
+<style>
+:root{--green:#2f6b3c;--light:#f4f8f1;--dark:#18321e;--accent:#d99b42}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#243027;background:#fff}
+header{background:var(--green);color:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+.logo{font-size:25px;font-weight:800}.cart{background:#fff;color:var(--green);border:0;padding:10px 15px;border-radius:22px;font-weight:bold;cursor:pointer}
+.hero{background:linear-gradient(135deg,#e9f3df,#fff7e8);padding:55px 5%;text-align:center}.hero h1{font-size:42px;margin:0 0 12px;color:var(--dark)}.hero p{font-size:18px}
+.btn{background:var(--green);color:white;border:0;padding:12px 20px;border-radius:8px;cursor:pointer;font-weight:bold}
+section{padding:35px 5%}.section-title{text-align:center;color:var(--dark)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px;max-width:1100px;margin:auto}
+.card{border:1px solid #e2e8df;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 5px 18px #0000000d}.pic{height:170px;background:#edf4e8;display:flex;align-items:center;justify-content:center;font-size:60px}.info{padding:16px}.price{font-size:20px;font-weight:bold;color:var(--green);margin:10px 0}
+footer{background:var(--dark);color:#fff;text-align:center;padding:28px 5%;margin-top:20px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:10;padding:20px}.box{background:#fff;max-width:520px;margin:40px auto;padding:24px;border-radius:14px;max-height:90vh;overflow:auto}
+input,textarea,select{width:100%;padding:12px;margin:7px 0 12px;border:1px solid #ccd6ca;border-radius:7px}
+.close{float:right;border:0;background:none;font-size:25px;cursor:pointer}
+.cart-item{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:10px 0}
+.note{font-size:13px;color:#667}
+</style>
+</head>
+<body>
+<header><div class="logo">🌿 Naturefeelstore</div><button class="cart" onclick="openCart()">🛒 Cart (<span id="count">0</span>)</button></header>
+
+<div class="hero">
+<h1>Natural Products. Simple Living.</h1>
+<p>Handmade, traditional and nature-inspired products for everyday life.</p>
+<button class="btn" onclick="document.getElementById('shop').scrollIntoView()">Shop Now</button>
+</div>
+
+<section id="shop">
+<h2 class="section-title">Our Products</h2>
+<div class="grid" id="products"></div>
+</section>
+
+<section style="background:var(--light);text-align:center">
+<h2 class="section-title">Why Naturefeelstore?</h2>
+<p>🌱 Nature-inspired &nbsp; • &nbsp; 👐 Handmade &nbsp; • &nbsp; ♻️ Simple & Eco-friendly</p>
+<p class="note">Product prices and availability can be updated before launch.</p>
+</section>
+
+<footer>
+<strong>Naturefeelstore</strong><br><br>
+Natural & Handmade Products<br>
+Contact: Add your WhatsApp number before launch
+</footer>
+
+<div class="modal" id="cartModal">
+<div class="box">
+<button class="close" onclick="closeCart()">×</button>
+<h2>Your Cart</h2><div id="cartItems"></div>
+<h3>Total: ₹<span id="total">0</span></h3>
+<h2>Checkout</h2>
+<input id="name" placeholder="Full name">
+<input id="phone" placeholder="Mobile number">
+<textarea id="address" placeholder="Delivery address"></textarea>
+<select id="payment"><option>Cash on Delivery</option><option>UPI (configure before launch)</option></select>
+<button class="btn" style="width:100%" onclick="placeOrder()">Place Order</button>
+<p class="note">This demo checkout does not process real payments yet.</p>
+</div></div>
+
+<script>
+const products=[
+{name:"Natural Fuel",price:199,icon:"🔥",desc:"Nature-inspired fuel product."},
+{name:"Natural Wooden Ash",price:99,icon:"🌳",desc:"Natural wooden ash for household and traditional uses."},
+{name:"Homemade Door Mats",price:299,icon:"🧶",desc:"Handmade door mats for your home."},
+{name:"Homemade Hand Fan",price:149,icon:"🪭",desc:"Traditional handmade hand fan."},
+{name:"Homemade Chulha",price:799,icon:"🪵",desc:"Traditional handmade chulha for suitable uses."}
+];
+let cart=[];
+function render(){
+document.getElementById("products").innerHTML=products.map((p,i)=>`
+<div class="card"><div class="pic">${p.icon}</div><div class="info">
+<h3>${p.name}</h3><p>${p.desc}</p><div class="price">₹${p.price}</div>
+<button class="btn" onclick="add(${i})">Add to Cart</button></div></div>`).join("");
+}
+function add(i){cart.push(products[i]);update();alert(products[i].name+" added to cart");}
+function update(){document.getElementById("count").textContent=cart.length}
+function openCart(){
+document.getElementById("cartModal").style.display="block";
+document.getElementById("cartItems").innerHTML=cart.length?cart.map((p,i)=>`<div class="cart-item"><span>${p.name}</span><b>₹${p.price}</b></div>`).join(""):"Your cart is empty.";
+document.getElementById("total").textContent=cart.reduce((s,p)=>s+p.price,0);
+}
+function closeCart(){document.getElementById("cartModal").style.display="none"}
+function placeOrder(){
+if(!cart.length)return alert("Please add a product first.");
+let n=document.getElementById("name").value,p=document.getElementById("phone").value,a=document.getElementById("address").value;
+if(!n||!p||!a)return alert("Please complete your name, mobile and address.");
+alert("Thank you, "+n+"! Your order request has been recorded in this demo. Connect WhatsApp/payment gateway before accepting live orders.");
+}
+render();
+</script>
+</body>
+</html>
